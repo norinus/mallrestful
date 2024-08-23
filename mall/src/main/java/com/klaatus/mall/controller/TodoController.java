@@ -5,12 +5,10 @@ import com.klaatus.mall.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Map;
 
 @RestController
@@ -34,7 +32,6 @@ public class TodoController {
     @PutMapping("/{tno}")
     public Map<String, String> update(@PathVariable Long tno, @RequestBody TodoDTO todoDTO) {
         todoService.update(tno, todoDTO);
-
         return Map.of("RESULT", "SUCCESS");
     }
 
@@ -46,11 +43,6 @@ public class TodoController {
 
     @GetMapping("/list")
     public Page<TodoDTO> list(@PageableDefault(size = 10, sort = "tno", direction = Sort.Direction.DESC)Pageable pageable) {
-
-        log.info("Sort: {}", pageable.getSort());
-
-        log.info("페이지 정보: {}", pageable);
-
         return todoService.list(pageable);
     }
 
