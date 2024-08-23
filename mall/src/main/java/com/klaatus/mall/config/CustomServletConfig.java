@@ -21,6 +21,6 @@ public class CustomServletConfig implements WebMvcConfigurer {
                 .allowedOrigins("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS","HEAD")
                 .maxAge(300)
-                .allowedHeaders("Authorization", "Content-Type", "Cache-Control", "X-Requested-With");
+                .allowedHeaders("Authorization", "Content-Type", "Cache-Control");
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedModel;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class TodoController {
 
     @PostMapping("/")
     public Map<String, Long> create(@RequestBody TodoDTO todoDTO) {
-        return Map.of("TNO:", todoService.create(todoDTO));
+        return Map.of("TNO", todoService.create(todoDTO));
     }
 
     @GetMapping("/{tno}")

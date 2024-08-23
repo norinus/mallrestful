@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RootConfig {
 
+    //Entity TO DTO  OR DTO TO Entity 값 복사
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
@@ -19,5 +20,4 @@ public class RootConfig {
 
         return modelMapper;
     }
-
 }
