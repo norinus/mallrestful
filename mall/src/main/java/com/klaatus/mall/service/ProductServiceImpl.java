@@ -1,0 +1,121 @@
+package com.klaatus.mall.service;
+
+import com.klaatus.mall.domain.Product;
+import com.klaatus.mall.domain.ProductImage;
+import com.klaatus.mall.dto.ProductDTO;
+import com.klaatus.mall.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+@Transactional
+public class ProductServiceImpl implements ProductService {
+
+    private final ProductRepository productRepository;
+    private final ModelMapper modelMapper;
+
+    @Override
+    public Long create(ProductDTO productDTO) {
+        return productRepository.save(toEntity(productDTO)).getPno();
+    }
+
+    @Override
+    public ProductDTO read(Long pno) {
+        return toDTO(productRepository.selectOne(pno).orElseThrow());
+    }
+
+    @Override
+    public void update(Long tno, ProductDTO productDTO) {
+        productRepository.findById(tno).ifPresent(product -> {
+            product.changePrice(productDTO.getPrice());
+            product.changePName(productDTO.getPname());
+            product.changeDescription(productDTO.getDescription());
+            product.clearList();
+
+            List<String> uploadFileNames = productDTO.getUploadFileNames();
+
+            if(uploadFileNames != null && !uploadFileNames.isEmpty()) {
+                uploadFileNames.forEach(product::addImageString);
+            }
+
+            productRepository.save(product);
+        });
+    }
+
+    @Override
+    public void delete(Long tno) {
+        productRepository.findById(tno).ifPresent(product -> {
+            product.changeIsDeleted(true);
+            productRepository.save(product);
+        });
+    }
+
+    @Override
+    public Page<ProductDTO> list(Pageable pageable) {
+        return productRepository.findAllByIsDeletedFalse(pageable).map(element ->
+                ProductDTO.builder()
+                        .pno(element.getPno())
+                        .description(element.getDescription())
+                        .pname(element.getPname())
+                        .price(element.getPrice())
+                        .uploadFileNames(element.getImageList().stream()
+                                .filter(image -> image.getSortNum() == 0)
+                                .map(ProductImage::getFileName)
+                                .toList())
+                        .build()
+        );
+    }
+
+    /**
+     * DTO TO ENTITY
+     *
+     * @param productDTO
+     * @return
+     */
+    private Product toEntity(ProductDTO productDTO) {
+
+        Product product = Product.builder().pno(productDTO.getPno()).isDeleted(false).pname(productDTO.getPname()).description(productDTO.getDescription()).price(productDTO.getPrice()).build();
+
+        List<String> uploadFileNames = productDTO.getUploadFileNames();
+
+        if (uploadFileNames == null || uploadFileNames.isEmpty()) {
+            return product;
+        }
+
+        uploadFileNames.forEach(product::addImageString);
+
+        return product;
+    }
+
+
+    /**
+     *ENTITY TO  DTO
+     *
+     * @param product
+     * @return
+     */
+    private ProductDTO toDTO(Product product) {
+
+        ProductDTO productDTO = ProductDTO.builder().pno(product.getPno()).pname(product.getPname()).description(product.getDescription()).price(product.getPrice()).build();
+
+        List<ProductImage> imageList = product.getImageList();
+
+        if (imageList == null || imageList.isEmpty()) {
+            return productDTO;
+        }
+
+        productDTO.setUploadFileNames(imageList.stream().map(ProductImage::getFileName).toList());
+
+        return productDTO;
+    }
+
+}

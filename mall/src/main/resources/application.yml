@@ -2,6 +2,16 @@ spring:
   application:
     name: mall
 
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 30MB
+
+
+
+
+
   datasource:
     driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@127.0.0.1:1521:xe
@@ -19,3 +29,12 @@ logging:
   level:
     root: info
     com.klaatus.mall.*: trace
+
+
+
+
+
+com:
+  klaatus:
+    upload:
+      path: upload

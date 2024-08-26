@@ -43,6 +43,7 @@ public class TodoController {
 
     @GetMapping("/list")
     public Page<TodoDTO> list(@PageableDefault(size = 10, sort = "tno", direction = Sort.Direction.DESC)Pageable pageable) {
+
         return todoService.list(pageable);
     }
 
