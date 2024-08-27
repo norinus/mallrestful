@@ -52,7 +52,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             //1. principal: 인증할 사용자 정보 memberDTO
             //2. credentials: 사용자의 자격 증명 password
             //3. authorities: 사용자의 권한 정보 authorities
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO, password, authorities);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO, password, memberDTO.getAuthorities());
 
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 

@@ -101,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public Page<ProductDTO> list(Pageable pageable) {
-        return productRepository.findAllByIsDeletedFalse(pageable).map(element ->
+        return productRepository.findAll(pageable).map(element ->
 
                 ProductDTO.builder()
                         .pno(element.getPno())

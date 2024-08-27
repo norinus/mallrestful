@@ -15,8 +15,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @EntityGraph(attributePaths = "imageList")
     Optional<Product> findByPno(Long pno);
 
+
+    //삭제된 상품 제외 모든 상품
     @EntityGraph(attributePaths = "imageList")
     Page<Product> findAllByIsDeletedFalse(Pageable pageable);
+
+    //모든 상품 정보
+    @EntityGraph(attributePaths = "imageList")
+    Page<Product> findAll(Pageable pageable);
 
     //사용안함
     @Deprecated
