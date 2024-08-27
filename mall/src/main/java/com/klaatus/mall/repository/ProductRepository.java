@@ -14,12 +14,18 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+
     @EntityGraph(attributePaths = "imageList")
-    @Query("select p from Product p where p.pno= :pno")
-    Optional<Product> selectOne(@Param("pno") Long pno);
+    Optional<Product> findByPno(Long pno);
 
     @EntityGraph(attributePaths = "imageList")
     Page<Product> findAllByIsDeletedFalse(Pageable pageable);
+
+
+    @Deprecated
+    @EntityGraph(attributePaths = "imageList")
+    @Query("select p from Product p where p.pno= :pno")
+    Optional<Product> selectOne(@Param("pno") Long pno);
 
     @Deprecated
     @Modifying

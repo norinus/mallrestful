@@ -48,7 +48,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO read(Long pno) {
-        return toDTO(productRepository.selectOne(pno).orElseThrow());
+        return toDTO(productRepository.findByPno(pno).orElseThrow());
     }
 
     @Override
