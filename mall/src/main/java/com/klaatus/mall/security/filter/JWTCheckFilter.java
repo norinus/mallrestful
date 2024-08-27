@@ -88,7 +88,9 @@ public class JWTCheckFilter extends OncePerRequestFilter {
      * @throws IOException
      */
     private void handleException(HttpServletResponse response, Exception e) throws IOException {
+
         log.error("JWT Check Filter Exception: {}", e.getMessage());
+
         String errorMsg = new Gson().toJson(Map.of("error", e.getMessage()));
 
         response.setContentType("application/json;charset=utf-8");
