@@ -21,7 +21,6 @@ public class TodoServiceImpl implements TodoService {
 
     private final ModelMapper modelMapper;
 
-
     @Override
     public Long create(TodoDTO todoDTO) {
         return repository.save(modelMapper.map(todoDTO, Todo.class)).getTno();

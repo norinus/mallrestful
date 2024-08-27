@@ -164,6 +164,7 @@ public class ProductServiceImpl implements ProductService {
                 .pname(product.getPname())
                 .description(product.getDescription())
                 .price(product.getPrice())
+                .isDeleted(product.getIsDeleted())
                 .build();
 
         List<ProductImage> imageList = product.getImageList();
