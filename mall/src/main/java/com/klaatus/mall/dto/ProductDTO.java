@@ -23,6 +23,8 @@ public class ProductDTO {
 
     private String description;
 
+    private Boolean isDeleted;
+
     @Builder.Default
     private List<MultipartFile> files = new ArrayList<>();
 

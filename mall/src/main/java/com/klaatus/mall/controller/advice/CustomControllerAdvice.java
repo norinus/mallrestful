@@ -1,5 +1,6 @@
 package com.klaatus.mall.controller.advice;
 
+import com.klaatus.mall.utils.CustomJWTException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -29,21 +30,27 @@ public class CustomControllerAdvice {
 
     //산술 연산 중에 발생하는 예외
     @ExceptionHandler(ArithmeticException.class)
-    public ResponseEntity<?> handleNoSuchElementFoundException(ArithmeticException exception) {
+    protected ResponseEntity<?> handleNoSuchElementFoundException(ArithmeticException exception) {
         String message = exception.getMessage();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("msg",message));
     }
 
     //메서드 호출 시 인자로 전달되는 값 자체가 잘못된 경우
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException exception) {
+    protected ResponseEntity<?> handleIllegalArgument(IllegalArgumentException exception) {
         String message = exception.getMessage();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("msg",message));
     }
 
     @ExceptionHandler({Exception.class})
-    public ResponseEntity<Object> handleAllException(Exception exception) {
+    protected ResponseEntity<Object> handleAllException(Exception exception) {
         String message = exception.getMessage();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("msg",message));
+    }
+
+    @ExceptionHandler(CustomJWTException.class)
+    protected ResponseEntity<?> handleCustomJWTException(CustomJWTException exception) {
+        String message = exception.getMessage();
+        return ResponseEntity.ok().body(Map.of("error",message));
     }
 }

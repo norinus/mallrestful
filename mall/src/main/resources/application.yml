@@ -29,10 +29,7 @@ logging:
   level:
     root: info
     com.klaatus.mall.*: trace
-
-
-
-
+    org.springframework.security.web : trace
 
 com:
   klaatus:

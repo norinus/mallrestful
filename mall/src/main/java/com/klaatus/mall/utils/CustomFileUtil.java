@@ -32,25 +32,23 @@ public class CustomFileUtil {
     @Value("${com.klaatus.upload.path}")
     private  String uploadPath;
 
-
+    /**
+     * 프로젝트 실행시 무조건 실행
+     */
     @PostConstruct
     public void init() {
-
         File temFolder = new File(uploadPath);
-
         if(!temFolder.exists()){
             temFolder.mkdirs();
         }
-
         uploadPath =temFolder.getAbsolutePath();
-
-        log.info("----업로드---패스:{}", uploadPath);
+        log.info("******파일 업로드 경로:{}", uploadPath);
 
     }
 
     public List<String> saveFiles(List<MultipartFile> files) throws IOException {
 
-        if(files==null || files.size()==0){
+        if(files==null || files.isEmpty()){
             return null;
         }
 
