@@ -21,18 +21,19 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @EntityGraph(attributePaths = "imageList")
     Page<Product> findAllByIsDeletedFalse(Pageable pageable);
 
-
+    //사용안함
     @Deprecated
     @EntityGraph(attributePaths = "imageList")
     @Query("select p from Product p where p.pno= :pno")
     Optional<Product> selectOne(@Param("pno") Long pno);
 
+    //사용안함
     @Deprecated
     @Modifying
     @Query("update Product p set p.isDeleted=:isDeleted where p.pno=:pno")
     void updateToDelete(@Param("pno") Long pno, @Param("isDeleted") boolean isDeleted);
 
-
+    //사용안함
     @Deprecated
     @EntityGraph(attributePaths = "imageList")
     @Query("select p from Product p left join p.imageList pi where pi.sortNum = 0 and p.isDeleted = false ")
