@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -26,8 +25,8 @@ public class RefreshController {
 
         if (authHeader == null || authHeader.length() < 7) {
             throw new CustomJWTException("NULL AUTH HEADER");
-
         }
+
         String accessToken = authHeader.substring(7);
 
         if (!checkExpiredToken(accessToken)) {
@@ -43,7 +42,6 @@ public class RefreshController {
 
         return Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken);
     }
-
     /**
      * 토큰 만료 남은 시간 체크
      * @param exp
@@ -62,7 +60,6 @@ public class RefreshController {
      * @return
      */
     private boolean checkExpiredToken(String token) {
-
         try{
             JWTUtil.validateToken(token);
         }catch (CustomJWTException e) {
@@ -70,7 +67,6 @@ public class RefreshController {
                 return true;
             }
         }
-
         return false;
     }
 

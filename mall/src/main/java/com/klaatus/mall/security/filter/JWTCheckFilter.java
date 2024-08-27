@@ -28,45 +28,43 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        try{
+        try {
             String accessToken = authHeader.substring(7);
 
-            Map<String,Object> clams = JWTUtil.validateToken(accessToken);
+            Map<String, Object> clams = JWTUtil.validateToken(accessToken);
 
-            log.info("------------->JWT Check Clams: {}",clams);
+            log.info("------------->JWT Check Clams: {}", clams);
 
+            //AccessToken 에서 유저 정보 추출
             String email = clams.get("email").toString();
-
             String password = clams.get("password").toString();
-
             String nickName = clams.get("nickName").toString();
-
             Boolean isSocial = (Boolean) clams.get("isSocial");
-
             List<String> roleNames = (List<String>) clams.get("roleNames");
 
-            MemberDTO memberDTO = new MemberDTO(email,password,nickName,isSocial,roleNames);
+            MemberDTO memberDTO = new MemberDTO(email, password, nickName, isSocial, roleNames);
 
-            log.info("------------->JWT Check memberDTO: {}",memberDTO);
-            log.info("------------->JWT Check memberDTO Authorities: {}",memberDTO.getAuthorities());
-
+            //권한 정보 생성
             List<SimpleGrantedAuthority> authorities = roleNames.stream()
                     .map(SimpleGrantedAuthority::new)
                     .toList();
 
+            //1. principal: 인증할 사용자 정보 memberDTO
+            //2. credentials: 사용자의 자격 증명 password
+            //3. authorities: 사용자의 권한 정보 authorities
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO, password, authorities);
 
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
             filterChain.doFilter(request, response);
 
-        }catch (Exception e){
+        } catch (Exception e) {
 
-            log.error("JWT Check Filter Exception: {}",e.getMessage());
+            log.error("JWT Check Filter Exception: {}", e.getMessage());
 
             Gson gson = new Gson();
 
-            String msg = gson.toJson(Map.of("error",e.getMessage()));
+            String msg = gson.toJson(Map.of("error", e.getMessage()));
             response.setContentType("application/json;charset=utf-8");
             PrintWriter out = response.getWriter();
             out.print(msg);
@@ -77,26 +75,28 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request)throws ServletException {
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 
         //PreFlight 요청은 체크 하지 않는다.
-        if(request.getMethod().equals("OPTIONS")){
+        if (request.getMethod().equals("OPTIONS")) {
             return true;
         }
 
-        String path  =request.getRequestURI();
+        String path = request.getRequestURI();
 
         log.info("JWT Check Filter path:{}", path);
 
-        if(path.startsWith("/api/member/")){
+        //필터에서 제외
+        if (path.startsWith("/api/member/")) {
             return true;
         }
 
-        if(path.startsWith("/api/products/view/")){
+        //필터에서 제외
+        if (path.startsWith("/api/products/view/")) {
             return true;
         }
 
-        return  false;
+        return false;
     }
 
 }

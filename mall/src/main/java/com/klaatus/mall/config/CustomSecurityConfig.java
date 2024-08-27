@@ -27,7 +27,7 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
-@EnableMethodSecurity
+@EnableMethodSecurity //Method 단에서 제어하기 위해
 public class CustomSecurityConfig {
 
     @Bean
@@ -59,9 +59,10 @@ public class CustomSecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 

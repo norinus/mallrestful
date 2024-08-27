@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
+
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -18,16 +18,16 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("select p from Product p where p.pno= :pno")
     Optional<Product> selectOne(@Param("pno") Long pno);
 
+    @EntityGraph(attributePaths = "imageList")
+    Page<Product> findAllByIsDeletedFalse(Pageable pageable);
 
+    @Deprecated
     @Modifying
     @Query("update Product p set p.isDeleted=:isDeleted where p.pno=:pno")
     void updateToDelete(@Param("pno") Long pno, @Param("isDeleted") boolean isDeleted);
 
 
-    @EntityGraph(attributePaths = "imageList")
-    Page<Product> findAllByIsDeletedFalse(Pageable pageable);
-
-
+    @Deprecated
     @EntityGraph(attributePaths = "imageList")
     @Query("select p from Product p left join p.imageList pi where pi.sortNum = 0 and p.isDeleted = false ")
     Page<Product> getList(Pageable pageable);

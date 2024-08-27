@@ -3,6 +3,7 @@ package com.klaatus.mall.service;
 import com.klaatus.mall.domain.Product;
 import com.klaatus.mall.domain.ProductImage;
 import com.klaatus.mall.dto.ProductDTO;
+import com.klaatus.mall.repository.MemberRepository;
 import com.klaatus.mall.repository.ProductRepository;
 import com.klaatus.mall.utils.CustomFileUtil;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
     private final CustomFileUtil customFileUtil;
+
+    private final MemberRepository memberRepository;
 
     @Override
     public Long create(ProductDTO productDTO) throws IOException {
@@ -97,6 +100,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductDTO> list(Pageable pageable) {
         return productRepository.findAllByIsDeletedFalse(pageable).map(element ->
+
                 ProductDTO.builder()
                         .pno(element.getPno())
                         .pname(element.getPname())
@@ -107,6 +111,7 @@ public class ProductServiceImpl implements ProductService {
                                 .filter(image -> image.getSortNum() == 0)
                                 .map(ProductImage::getFileName)
                                 .toList())
+
                         .build()
         );
     }

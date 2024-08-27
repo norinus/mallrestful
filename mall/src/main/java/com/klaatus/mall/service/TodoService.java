@@ -3,11 +3,10 @@ package com.klaatus.mall.service;
 import com.klaatus.mall.dto.TodoDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedModel;
 
 public interface TodoService {
 
-    public Long create(TodoDTO todoDTO);
+    Long create(TodoDTO todoDTO);
 
     TodoDTO read(Long tno);
 

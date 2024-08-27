@@ -46,6 +46,12 @@ public class CustomFileUtil {
 
     }
 
+    /**
+     * 이미지 파일 저장및 썸네일 이미지 생성
+     * @param files
+     * @return 이미지 파일명 리스트 리턴
+     * @throws IOException
+     */
     public List<String> saveFiles(List<MultipartFile> files) throws IOException {
 
         if(files==null || files.isEmpty()){
@@ -74,8 +80,6 @@ public class CustomFileUtil {
 
         return uploadNames;
     }
-
-
     /**
      * 업로드 이미지 가져 뷰에서 보기
      * @param fileName
@@ -98,8 +102,10 @@ public class CustomFileUtil {
         }
         return ResponseEntity.ok().headers(httpHeaders).body(resource);
     }
-
-
+    /**
+     * 사용자가 삭제한 파일 리스트 물리적으로 삭제(원본이미지, 썸네일 이미지)
+     * @param fileNames
+     */
     public void deleteFile(List<String> fileNames){
 
         if(fileNames==null || fileNames.isEmpty()){
