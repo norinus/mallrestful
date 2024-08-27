@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -21,83 +20,82 @@ import java.util.Map;
 @Slf4j
 public class JWTCheckFilter extends OncePerRequestFilter {
 
+    private static final String AUTH_HEADER_PREFIX = "Bearer ";
+    private static final String OPTIONS_METHOD = "OPTIONS";
+    private static final String API_MEMBER_PATH = "/api/member/";
+    private static final String API_PRODUCTS_VIEW_PATH = "/api/products/view/";
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-        log.info("------------->JWT Check Filter<-----------");
+        log.info("Processing JWT Check Filter");
 
         String authHeader = request.getHeader("Authorization");
 
-        try {
-            String accessToken = authHeader.substring(7);
+        if (authHeader != null && authHeader.startsWith(AUTH_HEADER_PREFIX)) {
 
-            Map<String, Object> clams = JWTUtil.validateToken(accessToken);
+            try {
+                String accessToken = authHeader.substring(AUTH_HEADER_PREFIX.length());
+                Map<String, Object> claims = JWTUtil.validateToken(accessToken);
 
-            log.info("------------->JWT Check Clams: {}", clams);
+                log.info("JWT Claims: {}", claims);
 
-            //AccessToken 에서 유저 정보 추출
-            String email = clams.get("email").toString();
-            String password = clams.get("password").toString();
-            String nickName = clams.get("nickName").toString();
-            Boolean isSocial = (Boolean) clams.get("isSocial");
-            List<String> roleNames = (List<String>) clams.get("roleNames");
+                MemberDTO memberDTO = extractMemberDTOFromClaims(claims);
 
-            MemberDTO memberDTO = new MemberDTO(email, password, nickName, isSocial, roleNames);
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(memberDTO, memberDTO.getPassword(), memberDTO.getAuthorities());
 
-            //권한 정보 생성 : 동작 안함.
-            List<SimpleGrantedAuthority> authorities = roleNames.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .toList();
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-            //1. principal: 인증할 사용자 정보 memberDTO
-            //2. credentials: 사용자의 자격 증명 password
-            //3. authorities: 사용자의 권한 정보 authorities
-            UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(memberDTO, password, memberDTO.getAuthorities());
-
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
-            filterChain.doFilter(request, response);
-
-        } catch (Exception e) {
-
-            log.error("JWT Check Filter Exception: {}", e.getMessage());
-
-            Gson gson = new Gson();
-
-            String msg = gson.toJson(Map.of("error", e.getMessage()));
-            response.setContentType("application/json;charset=utf-8");
-            PrintWriter out = response.getWriter();
-            out.print(msg);
-            out.flush();
-            out.close();
+            } catch (Exception e) {
+                handleException(response, e);
+                return; // Stop further processing
+            }
         }
+
+        filterChain.doFilter(request, response);
     }
 
-
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-
-        //PreFlight 요청은 체크 하지 않는다.
-        if (request.getMethod().equals("OPTIONS")) {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        if (OPTIONS_METHOD.equals(request.getMethod())) {
             return true;
         }
 
         String path = request.getRequestURI();
+        log.info("JWT Check Filter path: {}", path);
 
-        log.info("JWT Check Filter path:{}", path);
+        return path.startsWith(API_MEMBER_PATH) || path.startsWith(API_PRODUCTS_VIEW_PATH);
+    }
+    /**
+     * 사용자 정보 추출
+     * @param claims
+     * @return
+     */
+    private MemberDTO extractMemberDTOFromClaims(Map<String, Object> claims) {
 
-        //필터에서 제외
-        if (path.startsWith("/api/member/")) {
-            return true;
+        String email = claims.get("email").toString();
+        String password = claims.get("password").toString();
+        String nickName = claims.get("nickName").toString();
+        Boolean isSocial = (Boolean) claims.get("isSocial");
+        List<String> roleNames = (List<String>) claims.get("roleNames");
+
+        return new MemberDTO(email, password, nickName, isSocial, roleNames);
+    }
+    /**
+     * 에러 처리
+     * @param response
+     * @param e
+     * @throws IOException
+     */
+    private void handleException(HttpServletResponse response, Exception e) throws IOException {
+        log.error("JWT Check Filter Exception: {}", e.getMessage());
+        String errorMsg = new Gson().toJson(Map.of("error", e.getMessage()));
+
+        response.setContentType("application/json;charset=utf-8");
+        try (PrintWriter out = response.getWriter()) {
+            out.print(errorMsg);
+            out.flush();
         }
-
-        //필터에서 제외
-        if (path.startsWith("/api/products/view/")) {
-            return true;
-        }
-
-        return false;
     }
 
 }
