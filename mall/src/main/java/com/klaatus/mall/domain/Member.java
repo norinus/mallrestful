@@ -25,7 +25,7 @@ public class Member {
     private String nickName;
 
     @Builder.Default
-    private Boolean isSocial =false;
+    private Boolean isSocial = false;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @Builder.Default

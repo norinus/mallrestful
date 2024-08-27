@@ -47,6 +47,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductDTO read(Long pno) {
         return toDTO(productRepository.findByPno(pno).orElseThrow());
     }
@@ -98,6 +99,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ProductDTO> list(Pageable pageable) {
         return productRepository.findAllByIsDeletedFalse(pageable).map(element ->
 

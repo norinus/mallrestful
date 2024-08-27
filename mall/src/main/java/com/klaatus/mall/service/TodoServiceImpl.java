@@ -4,17 +4,17 @@ import com.klaatus.mall.domain.Todo;
 import com.klaatus.mall.dto.TodoDTO;
 import com.klaatus.mall.repository.TodoRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class TodoServiceImpl implements TodoService {
 
     private final TodoRepository repository;
