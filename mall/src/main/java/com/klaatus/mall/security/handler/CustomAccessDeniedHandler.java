@@ -17,9 +17,10 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
 
+
         Gson gson = new Gson();
 
-        String jsonStr = gson.toJson(Map.of("error", accessDeniedException.getMessage()));
+        String jsonStr = gson.toJson(Map.of("error", "ERROR_ACCESSDENIED"));
         response.setContentType("application/json;charset=utf-8");
         response.setStatus(HttpStatus.FORBIDDEN.value());
 

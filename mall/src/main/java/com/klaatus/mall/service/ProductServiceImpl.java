@@ -3,6 +3,7 @@ package com.klaatus.mall.service;
 import com.klaatus.mall.domain.Product;
 import com.klaatus.mall.domain.ProductImage;
 import com.klaatus.mall.dto.ProductDTO;
+import com.klaatus.mall.exception.ProductNotFoundException;
 import com.klaatus.mall.repository.MemberRepository;
 import com.klaatus.mall.repository.ProductRepository;
 import com.klaatus.mall.utils.CustomFileUtil;
@@ -19,6 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -49,13 +52,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public ProductDTO read(Long pno) {
-        return toDTO(productRepository.findByPno(pno).orElseThrow());
+        return toDTO(productRepository.findById(pno).orElseThrow(ProductNotFoundException::new));
     }
 
     @Override
     public void update(Long pno, ProductDTO productDTO) throws IOException {
 
-        ProductDTO oldProductDTO = toDTO(productRepository.selectOne(pno).orElseThrow());
+        ProductDTO oldProductDTO = toDTO(productRepository.findById(pno).orElseThrow(ProductNotFoundException::new));
 
         List<String> oldUploadFileNames = oldProductDTO.getUploadFileNames();
 
@@ -65,28 +68,35 @@ public class ProductServiceImpl implements ProductService {
 
         List<String> uploadedFileNames = productDTO.getUploadFileNames();
 
-        if(currentUploadFileNames!=null && !currentUploadFileNames.isEmpty()) {
+        if (currentUploadFileNames != null && !currentUploadFileNames.isEmpty()) {
             uploadedFileNames.addAll(currentUploadFileNames);
         }
 
-        productRepository.findById(pno).ifPresent(product -> {
-            product.changePrice(productDTO.getPrice());
-            product.changePName(productDTO.getPname());
-            product.changeDescription(productDTO.getDescription());
-            product.clearList();
+        // pno를 기반으로 Product를 조회하고, Product가 존재하지 않을 경우 예외를 던집니다.
+        Product product = productRepository.findById(pno)
+                .orElseThrow(ProductNotFoundException::new); // 적절한 예외 처리 필요
 
-            List<String> uploadFileNames = productDTO.getUploadFileNames();
+        // Product의 속성들을 업데이트합니다.
+        product.changePrice(productDTO.getPrice());
+        product.changePName(productDTO.getPname());
+        product.changeDescription(productDTO.getDescription());
 
-            if(uploadFileNames != null && !uploadFileNames.isEmpty()) {
-                uploadFileNames.forEach(product::addImageString);
-            }
+        // 기존의 이미지 리스트를 비우고, 새로운 이미지 파일 이름을 추가합니다.
+        product.clearList();
+        List<String> uploadFileNames = productDTO.getUploadFileNames();
+        if (uploadFileNames != null && !uploadFileNames.isEmpty()) {
+            uploadFileNames.forEach(product::addImageString);
+        }
 
-            productRepository.save(product);
-        });
+        // 변경된 Product 객체를 저장합니다.
+        productRepository.save(product);
 
-        if(oldUploadFileNames!=null && !oldUploadFileNames.isEmpty()) {
-            List<String> removeFiles  = oldUploadFileNames.stream().filter(fileName-> !uploadedFileNames.contains(fileName)).toList();
-            customFileUtil.deleteFile(removeFiles);
+        // 기존 파일과 업로드된 파일을 비교하여 삭제할 파일을 결정합니다.
+        if (oldUploadFileNames != null && !oldUploadFileNames.isEmpty()) {
+            List<String> removeFiles = oldUploadFileNames.stream()
+                    .filter(fileName -> !Objects.requireNonNull(uploadFileNames).contains(fileName))
+                    .toList();
+            customFileUtil.deleteFile(removeFiles); // 삭제할 파일을 실제로 삭제합니다.
         }
     }
 
@@ -152,7 +162,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     /**
-     *ENTITY TO  DTO
+     * ENTITY TO  DTO
      *
      * @param product
      * @return

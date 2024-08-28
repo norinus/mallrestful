@@ -22,8 +22,6 @@ public class MemberDTO extends User {
 
     private List<String> roleNames = new ArrayList<>();
 
-
-
     public MemberDTO(String email, String password, String nickName , Boolean isSocial, List<String> roleNames) {
         super(email, password, roleNames.stream().map(role-> new SimpleGrantedAuthority("ROLE_"+role)).toList());
 
@@ -33,7 +31,6 @@ public class MemberDTO extends User {
         this.isSocial = isSocial;
         this.roleNames = roleNames;
     }
-
 
     public Map<String, Object> getClaims() {
 
