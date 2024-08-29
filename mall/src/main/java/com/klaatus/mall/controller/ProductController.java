@@ -85,7 +85,7 @@ public class ProductController {
      * @param pageable
      * @return
      */
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/list")
     public Page<ProductDTO> list(@PageableDefault(size = 10, sort = "pno", direction = Sort.Direction.DESC) Pageable pageable) {
         return productService.list(pageable);
