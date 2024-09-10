@@ -40,5 +40,9 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         out.print(json);
         out.flush();
         out.close();
+
+        //api/main
+
+
     }
 }

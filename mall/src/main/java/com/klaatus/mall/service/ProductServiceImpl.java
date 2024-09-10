@@ -112,7 +112,6 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public Page<ProductDTO> list(Pageable pageable) {
         return productRepository.findAll(pageable).map(element ->
-
                 ProductDTO.builder()
                         .pno(element.getPno())
                         .pname(element.getPname())
